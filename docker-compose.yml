@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:7.4-fpm
+    container_name: php-container
+    volumes:
+      - sqlite_data:/var/www/data         # Mount the SQLite database folder
+      - ./php:/var/www/html               # Mount the PHP files (like index.php and backup.php)
+      - ./backups:/var/www/backup         # Mount the backup folder (local storage for backups)
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Custom Nginx configuration
+      - sqlite_data:/var/www/data           # Mount the SQLite database folder
+      - ./php:/var/www/html                 # Mount the PHP files
+    ports:
+      - "8080:80"                           # Map port 8080 to container port 80 (HTTP)
+    networks:
+      - backend
+
+networks:
+  backend:
+
+volumes:
+  sqlite_data:  # This volume stores the SQLite database (data persistence)
